@@ -25,3 +25,7 @@ replay_pid*
 .vscode
 lib
 bin
+.mvn
+mvnw.cmd
+HELP.md
+mvnw
