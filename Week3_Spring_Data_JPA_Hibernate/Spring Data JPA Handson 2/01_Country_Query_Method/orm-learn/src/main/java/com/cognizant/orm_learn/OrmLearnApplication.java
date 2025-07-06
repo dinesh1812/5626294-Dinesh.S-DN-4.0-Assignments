@@ -1,0 +1,116 @@
+package com.cognizant.orm_learn;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.cognizant.orm_learn.model.Country;
+import com.cognizant.orm_learn.service.CountryNotFoundException;
+import com.cognizant.orm_learn.service.CountryService;
+
+import jakarta.annotation.PostConstruct;
+
+@SpringBootApplication
+public class OrmLearnApplication {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrmLearnApplication.class);
+
+    @Autowired
+    private CountryService countryService;
+
+    public static void main(String[] args) {
+        SpringApplication.run(OrmLearnApplication.class, args);
+        LOGGER.info("Inside main");
+    }
+
+    private void getCountryByCode() {
+        LOGGER.info("Start");
+        try {
+            Country country = countryService.findCountryByCode("XX");
+            LOGGER.debug("Country: {}", country);
+        } catch (CountryNotFoundException e) {
+            LOGGER.error("Exception: {}", e.getMessage());
+        }
+        LOGGER.info("End");
+    }
+
+    private void testAddCountry() {
+        LOGGER.info("Start");
+
+        Country newCountry = new Country("ZZ", "Zetaland");
+        countryService.addCountry(newCountry);
+
+        try {
+            Country fetched = countryService.findCountryByCode("ZZ");
+            LOGGER.debug("Added Country: {}", fetched);
+        } catch (CountryNotFoundException e) {
+            LOGGER.error("Country not found after add: {}", e.getMessage());
+        }
+
+        LOGGER.info("End");
+    }
+
+    private void testUpdateCountry() {
+        LOGGER.info("Start");
+
+        try {
+            countryService.updateCountry("IN", "Bharat");
+            Country updated = countryService.findCountryByCode("IN");
+            LOGGER.debug("Updated Country: {}", updated);
+        } catch (CountryNotFoundException e) {
+            LOGGER.error("Update failed: {}", e.getMessage());
+        }
+
+        LOGGER.info("End");
+    }
+
+    private void testDeleteCountry() {
+        LOGGER.info("Start");
+
+        // This should match the code used in testAddCountry()
+        String codeToDelete = "ZZ";
+
+        countryService.deleteCountry(codeToDelete);
+
+        try {
+            countryService.findCountryByCode(codeToDelete);
+        } catch (CountryNotFoundException e) {
+            LOGGER.debug("Successfully deleted country with code {}: {}", codeToDelete, e.getMessage());
+        }
+
+        LOGGER.info("End");
+    }
+
+    private void testSearchByPartialName() {
+        LOGGER.info("Start");
+        List<Country> result = countryService.searchByPartialName("ou");
+        LOGGER.debug("Matching countries (ou): {}", result);
+        LOGGER.info("End");
+    }
+
+    private void testSearchByPartialNameSorted() {
+        LOGGER.info("Start");
+        List<Country> result = countryService.searchByPartialNameSorted("ou");
+        LOGGER.debug("Matching countries sorted (ou): {}", result);
+        LOGGER.info("End");
+    }
+
+    private void testSearchByFirstAlphabet() {
+        LOGGER.info("Start");
+        List<Country> result = countryService.searchByFirstAlphabet("I");
+        LOGGER.debug("Matching countries starting with Z: {}", result);
+        LOGGER.info("End");
+    }
+
+    @PostConstruct
+    private void runTests() {
+        testSearchByPartialName();
+        testSearchByPartialNameSorted();
+        testSearchByFirstAlphabet();
+    }
+
+}
