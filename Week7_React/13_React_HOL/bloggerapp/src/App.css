@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+  justify-content: space-around;
+  padding: 30px;
+  font-family: Arial;
+}
+
+.box {
+  border-left: 4px solid green;
+  padding-left: 20px;
+  width: 30%;
+}
